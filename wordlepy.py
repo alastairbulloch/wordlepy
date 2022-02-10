@@ -93,7 +93,7 @@ def _build_regex(raw_pattern: str, length: int, present: bool = True) -> Pattern
     pattern: str = r"^"
 
     if not raw_pattern:
-        return re.compile(r"^[\w][\w][\w][\w][\w]")
+        pattern = r"^[\w][\w][\w][\w][\w]"
 
     # todo: add a convention to the string input that indicates present or absent e.g. ^fb^c^de where a preceding
     #  ^ means the letter is abscent from that position but present in the word
@@ -106,8 +106,7 @@ def _build_regex(raw_pattern: str, length: int, present: bool = True) -> Pattern
         if not present and char.isalpha():
             pattern = pattern + f"[^{char}]"
 
-    regex = re.compile(pattern)
-    return regex
+    return re.compile(pattern)
 
 
 def exclude_positions() -> Optional[str]:
