@@ -2,8 +2,6 @@
 !/usr/bin/env python3
 -*- coding: utf-8 -*-
 
-Copyright (c) Richard Benjamin Allen
-
 MIT License
 
 Copyright (c) 2022 Richard Benjamin Allen
