@@ -4,9 +4,10 @@
 A simple Python 3.9 terminal program to help in the winning of wordles!  The implementation is an automation of the
 general strategy that I have been using to guess the daily wordles.  
 
-1. eliminate words that contain certain characters
-2. include words that contain certain characters
-3. eliminate words based on what we know about the locations of characters e.g. where they do and do not occur
+1. Use a good starting word with high entropy.
+1. Eliminate words that contain certain characters
+2. Include words that contain certain characters
+3. Eliminate words based on what we know about the locations of characters e.g. where they do and do not occur
 
 You can swap the dictionary used for another language if it's in the same format (JSON) as the default used in this 
 project i.e. the Webster's Unabridged English Dictionary.  As long as it is recognised by the Python method `isalpha`.
