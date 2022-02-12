@@ -5,12 +5,15 @@ A simple Python 3.9 terminal program to help in the winning of wordles!  The imp
 general strategy that I have been using to guess the daily wordles.  
 
 1. Use a good starting word with high entropy.
-1. Eliminate words that contain certain characters
-2. Include words that contain certain characters
-3. Eliminate words based on what we know about the locations of characters e.g. where they do and do not occur
+1. Eliminate words that contain certain characters.
+2. Include words that contain certain characters.
+3. Eliminate words based on what we know about the locations of characters e.g. where they do and do not occur.
 
 You can swap the dictionary used for another language if it's in the same format (JSON) as the default used in this 
-project i.e. the Webster's Unabridged English Dictionary.  As long as it is recognised by the Python method `isalpha`.
+project e.g. the Webster's Unabridged English Dictionary.  
+
+As long as characters in the words are recognised by the Python method `isalpha()` and regex, it should work.
+It can also be used with longer words than 5 letters by using the `length` argument.
 
 ## Installation
 This project requires Python 3.9 installing or a virtual environment that uses Python 3.9.  It uses the native modules 
@@ -78,6 +81,8 @@ python wordle.py -l 6 -d "path_to_alternative_dictionary" refine -p "abc" -a "de
 Thanks to Matthew Reagan https://github.com/matthewreagan/WebstersEnglishDictionary for his JSON version of
 the Guttenberg Project's Webster's Unabridged English Dictionary! 
 The original project can be found here: https://github.com/matthewreagan/WebstersEnglishDictionary
+
+The dictionary file provided by this project is covered by a separate licence
 
 Thanks to Peter Coles https://github.com/mrcoles for his list of good starting words!
 His interesting blog on the subject can be found here: https://mrcoles.com/best-wordle-starting-word/

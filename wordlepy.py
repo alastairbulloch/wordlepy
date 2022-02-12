@@ -1,7 +1,4 @@
 """
-!/usr/bin/env python3
--*- coding: utf-8 -*-
-
 MIT License
 
 Copyright (c) 2022 Richard Benjamin Allen
