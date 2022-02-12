@@ -300,7 +300,7 @@ def main(worldlepy_args) -> Set:
         raise InvalidFilterCombination("Your present and absent filters cannot contain a shared element!")
 
     # this dictionary contains some invalid entries containing white space and other non-alphabetic characters that
-    # won't appear ever appear in a wordle; the below will filter those out using the isalpha() conditional.
+    # won't ever appear in a wordle; the below will filter those out using the isalpha() conditional.
     pre_filtered_words: Set = {key for key in parsed_dictionary.keys() if len(key) == length and key.isalpha()}
 
     filtered_words = filter_entries_by_presence_or_absence(
