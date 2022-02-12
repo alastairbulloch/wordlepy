@@ -82,7 +82,7 @@ Thanks to Matthew Reagan https://github.com/matthewreagan/WebstersEnglishDiction
 the Guttenberg Project's Webster's Unabridged English Dictionary! 
 The original project can be found here: https://github.com/matthewreagan/WebstersEnglishDictionary
 
-The dictionary file provided by this project is covered by a separate licence
+The dictionary file provided by this project is covered by the Gutenberg Project's licensing.
 
 Thanks to Peter Coles https://github.com/mrcoles for his list of good starting words!
 His interesting blog on the subject can be found here: https://mrcoles.com/best-wordle-starting-word/
