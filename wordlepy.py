@@ -358,10 +358,10 @@ if __name__ == "__main__":
     try:
         success = main(args)
         print(success)
-    except BaseException:
-        raise "Unhandled exception in wordlepy"
     except(DictionaryNotFound, InvalidCharacterString, InvalidFilterCombination) as main_error:
         raise main_error
+    except BaseException:
+        raise "Unhandled exception in wordlepy"
 
     if success:
         sys.exit(0)
