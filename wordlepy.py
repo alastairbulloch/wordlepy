@@ -310,8 +310,9 @@ def main(worldlepy_args) -> Set:
     )
 
     if worldlepy_args.regex:
-        regex: Pattern = _build_regex(worldlepy_args.regex)
-        filtered_words = refined_by_regex(filtered_words, regex)
+        for raw_regex in worldlepy_args.regex:
+            regex: Pattern = _build_regex(raw_regex)
+            filtered_words = refined_by_regex(filtered_words, regex)
 
     return filtered_words
 
@@ -337,7 +338,7 @@ if __name__ == "__main__":
     parser.add_argument("-l", "--length", type=int, required=False, default=5,
                         help="Specify the length of the word you wish to look up, the default is a length of 5 "
                              "characters.")
-    refine.add_argument("-r", "--regex", type=str, required=False,
+    refine.add_argument("-r", "--regex", type=str, action='append', required=False,
                         help="Specify a word using wild cards to eliminate some duds from the suggestions"
                              "use the following convention.")
     parser.add_argument("-s", "--suggest", action="store_true",
