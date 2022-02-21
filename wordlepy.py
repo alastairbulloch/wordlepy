@@ -36,10 +36,11 @@ import json
 import os
 import re
 import sys
+import parse_dictionary
 
-from typing import Dict, List, Optional, Pattern, Set
+from typing import List, Optional, Pattern
 
-GOOD_STARTING_WORDS: Set = {
+GOOD_STARTING_WORDS = [
     "roate",
     "orate",
     "oater",
@@ -50,7 +51,7 @@ GOOD_STARTING_WORDS: Set = {
     "artel",
     "alter",
     "alert"
-}
+]
 
 
 class RawPatternParseError(Exception):
@@ -69,22 +70,7 @@ class InvalidFilterCombination(Exception):
     pass
 
 
-def parse_json(file_path: str) -> Dict:
-    """
-    Parses a JSON file into a Python dictionary for use in creating filtered subsets.
-    :param file_path: String containing the file path to the dictionary you wish to parse.
-    :return: Dictionary containing key value pairs of the JSON file.
-    :raises: ValueError if the function cannot load the JSON file.
-    """
-    english_dictionary: Dict = {}
 
-    with open(file_path, "r") as file:
-        try:
-            english_dictionary = json.load(file)
-        except ValueError:
-            raise ValueError("Could not parse dictionary, it is probably not in the right format!")
-
-    return english_dictionary
 
 
 def _check_lists(present, absent) -> bool:
@@ -149,16 +135,16 @@ def _absent(word: str, a_chars: List) -> Optional[str]:
     return None
 
 
-def __pattern_parser(raw_patten: str) -> Dict:
+def __pattern_parser(raw_patten: str) -> List:
     """
-    Parses a User defined simplified regex and turns it into a dictionary the exact length of the word, using integers
+    Parses a User defined simplified regex and turns it into a list the exact length of the word, using integers
     as keys and the regex for that single character as values.  A raw_pattern such as: ?^ab^c? for example will yield
     a dictionary like {1: "[\\w]", 2: "[^a]", 3: "[b]", 4: "[^c]", 5: [\\w]}.
     :param raw_patten: String containing a simplified regex like pattern defined by the User.
-    :return: Dictionary containing a regex map of the word to be guessed
+    :return: list containing a regex map of the word to be guessed
     :raises RawPatternPaseException: if it finds unexpected characters in the raw_pattern.
     """
-    regex_map: Dict = {}
+    regex_map: List = {}
     char_counter: int = 1
 
     for index, char in enumerate(raw_patten):
@@ -184,7 +170,7 @@ def _build_regex(raw_pattern: str) -> Pattern:
     """
     Uses a simplified User defined regex pattern to construct a real one, this allows a normal User to harness the
     power of Python regular expressions to be used in refining their set of words to try later.  It uses a helper
-    function to construct a dictionary containing the regex for each character position.
+    function to construct a list containing the regex for each character position.
     A dictionary like {1: "[\\w]", 2: "[^a]", 3: "[b]", 4: "[^c]", 5: [\\w]} will result in a regex pattern like
     r"^[\\w][^a][b][^c][\\w]" where the \\w is a wildcard, ^a and ^c excludes those characters in those positions
     and [b] includes the b character in that position in the word.
@@ -195,7 +181,7 @@ def _build_regex(raw_pattern: str) -> Pattern:
     pattern: str = r"^"
 
     try:
-        regex_map: Dict = __pattern_parser(raw_pattern)
+        regex_map: List = __pattern_parser(raw_pattern)
     except RawPatternParseError as error:
         raise error
 
@@ -205,34 +191,34 @@ def _build_regex(raw_pattern: str) -> Pattern:
     return re.compile(pattern)
 
 
-def refined_by_regex(word_subset: Set, regex):
+def refined_by_regex(word_subset: List, regex):
     """
-    Uses regex to match words in a set against a pre-compiled regular expression pattern.
-    :param word_subset: Set containing a pre-filtered words from the English dictionary.
+    Uses regex to match words in a dictionary against a pre-compiled regular expression pattern.
+    :param word_subset: List containing a pre-filtered words from the English dictionary.
     :param regex: Pattern containing a compiled regular expression.
-    :return:  Set with reduced number of words based on the regular expression.
+    :return:  List with reduced number of words based on the regular expression.
     """
-    regex_matches: Set = set()
+    regex_matches: List = list()
 
     for word in word_subset:
         if re.match(regex, word):
-            regex_matches.add(word)
+            regex_matches.append(word)
 
     return regex_matches
 
 
-def filter_entries_by_presence_or_absence(dictionary_subset: Set, **kwargs) -> Set:
+def filter_entries_by_presence_or_absence(dictionary_subset: List, **kwargs) -> List:
     """
-    Filters a set of words further by using two helper functions that check if a list of chars is either present or
-    absent from the set of words.  Uses two possible keyword arguments `present` and `absent` which contain a list of
+    Filters a List of words further by using two helper functions that check if a list of chars is either present or
+    absent from the List of words.  Uses two possible keyword arguments `present` and `absent` which contain a list of
     characters which are either present or absent from the word based on your previous wordle guesses.
-    :param dictionary_subset: Set containing a pre-filtered words from the English dictionary.
-    :return: Set with reduced number of words if kwargs provided; the original set of words if not.
+    :param dictionary_subset: List containing a pre-filtered words from the English dictionary.
+    :return: List with reduced number of words if kwargs provided; the original dictionary of words if not.
     """
     c_present: List = kwargs.get("present")
     c_absent: List = kwargs.get("absent")
 
-    filtered_results: Set = set()
+    filtered_results: List = list()
 
     if not c_present and not c_absent:
         return dictionary_subset
@@ -240,31 +226,30 @@ def filter_entries_by_presence_or_absence(dictionary_subset: Set, **kwargs) -> S
     for word in dictionary_subset:
         if c_present and c_absent:
             if _present(word, c_present) and _absent(word, c_absent):
-                filtered_results.add(word)
+                filtered_results.append(word)
 
         elif c_present and not c_absent:
             if _present(word, c_present):
-                filtered_results.add(word)
+                filtered_results.append(word)
 
         elif c_absent and not c_present:
             if _absent(word, c_absent):
-                filtered_results.add(word)
+                filtered_results.append(word)
 
     return filtered_results
 
-
-def main(worldlepy_args) -> Set:
+def wordlepy(worldlepy_args) -> List:
     """
-    Main function that checks the arguments passed into wordlepy and assembles a filtered set of words accordingly.
+    Function that checks the arguments passed into wordlepy and assembles a filtered list of words accordingly.
     :param worldlepy_args: Namespace containing the arguments passed via the terminal.
-    :return: Set of filtered words depending on the other parameters.
+    :return: List of filtered words depending on the other parameters.
     :raises ValueError: If the custom dictionary provided isn't in the correct format.
     :raises DictionaryNotFound: If the specified custom dictionary cannot be located using the path specified.
     :raises InvalidCharacterString: If the present or absent parameter string contains a non-alphabetic character.
     :raises InvalidFilterCombination: If you list a character in both present and absent parameter strings.
     """
     suggest: bool = worldlepy_args.suggest
-    filtered_words: Set
+    filtered_words: List
     present_chars: List = []
     absent_chars: List = []
 
@@ -272,15 +257,12 @@ def main(worldlepy_args) -> Set:
         return GOOD_STARTING_WORDS
 
     length: int = worldlepy_args.length
-    parsed_dictionary: Dict
-
+    
     if not os.path.exists(worldlepy_args.dictionary):
         raise DictionaryNotFound(f"The specified path: {worldlepy_args.dictionary} doesn't exist or is invalid!")
-
-    try:
-        parsed_dictionary = parse_json("data/websters-english-dictionary.json")
-    except ValueError as error:
-        raise error
+    
+    # Load up our dictionary
+    pre_filtered_words = parse_dictionary.parse(worldlepy_args.dictionary, length)
 
     if worldlepy_args.present:
         present: str = worldlepy_args.present
@@ -299,9 +281,7 @@ def main(worldlepy_args) -> Set:
     if _check_lists(present_chars, absent_chars):
         raise InvalidFilterCombination("Your present and absent filters cannot contain a shared element!")
 
-    # this dictionary contains some invalid entries containing white space and other non-alphabetic characters that
-    # won't ever appear in a wordle; the below will filter those out using the isalpha() conditional.
-    pre_filtered_words: Set = {key for key in parsed_dictionary.keys() if len(key) == length and key.isalpha()}
+    
 
     filtered_words = filter_entries_by_presence_or_absence(
         pre_filtered_words,
@@ -317,7 +297,12 @@ def main(worldlepy_args) -> Set:
     return filtered_words
 
 
-if __name__ == "__main__":
+def main(argv):
+    
+    """
+    Performing parsing of arguments.
+    This allows the script to be callable with arguments from outside.
+    """
     parser = argparse.ArgumentParser(description="Terminal program to help you to optimise your wordle guesses!")
 
     subparser = parser.add_subparsers(dest="command")
@@ -339,12 +324,12 @@ if __name__ == "__main__":
                         help="Specify the length of the word you wish to look up, the default is a length of 5 "
                              "characters.")
     refine.add_argument("-r", "--regex", type=str, action='append', required=False,
-                        help="Specify a word using wild cards to eliminate some duds from the suggestions"
+                        help="Specify a word using wild cards to eliminate some duds from the suggestions "
                              "use the following convention.")
     parser.add_argument("-s", "--suggest", action="store_true",
                         help="Use this to suggest good starting words depending on word length, default is False.")
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     if args.suggest:
         if args.command == "refine":
@@ -355,16 +340,17 @@ if __name__ == "__main__":
         if not args.regex and not args.present and not args.absent:
             print("You cannot use refine without specifying at least one refine argument!")
             sys.exit(1)
-
+            
     try:
-        success = main(args)
-        print(success)
+        filtered_words = wordlepy(args)        
     except(DictionaryNotFound, InvalidCharacterString, InvalidFilterCombination) as main_error:
         raise main_error
-    except BaseException:
-        raise "Unhandled exception in wordlepy"
 
-    if success:
-        sys.exit(0)
-    else:
-        sys.exit(1)
+    return filtered_words
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
+    
+    
+
+    
